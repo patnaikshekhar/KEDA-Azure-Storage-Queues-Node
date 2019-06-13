@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keda-azure-storage-queue-node
+  namespace: keda-storage-queue-sample
+spec:
+  selector:
+    matchLabels:
+      service: keda-azure-storage-queue-node
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        service: keda-azure-storage-queue-node
+    spec:
+      containers:
+      - image: patnaikshekhar/keda-azure-storage-queue-node:1
+        name: consumer
+        env:
+        - name: CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: keda-storage-queue-sample
+              key: STORAGE_ACCOUNT_CONN_STRING
+        - name: QUEUE_NAME
+          value: keda-test

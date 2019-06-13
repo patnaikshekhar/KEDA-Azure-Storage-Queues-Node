@@ -1,0 +1,16 @@
+apiVersion: keda.k8s.io/v1alpha1
+kind: ScaledObject
+metadata:
+  name: azure-queue-scaledobject
+  namespace: keda-storage-queue-sample
+  labels:
+    deploymentName: keda-azure-storage-queue-node
+spec:
+  scaleTargetRef:
+    deploymentName: keda-azure-storage-queue-node
+  triggers:
+  - type: azure-queue
+    metadata:
+      queueName: keda-test
+      connection: CONNECTION_STRING
+      queueLength: "5"
