@@ -1,14 +1,19 @@
 # KEDA Storage Queue Node.js Example
 
-This is an example of using [KEDA](https://github.com/kedacore/keda) with storage queues.
+This is an example of using [KEDA](https://github.com/kedacore/keda) with storage queues in Nodejs.
+
+KEDA (Kubernetes-based Event Driven Autoscaling) allows you to auto scale your kubernetes pods based on external metrics derived from systems such as RabbitMQ, Azure Storage Queues, Azure ServiceBus, etc. It also lets your scale the number of pods to zero so that you're not consuming resources when there is no processing to be done.
+
+# Prerequisites
+You need a Kubernetes cluster with KEDA installed. The [KEDA git hub repository](https://github.com/kedacore/keda) explains how this can be done using Helm.
 
 # Tutorial
 
 We'll start of by cloning this repository and creating a resource group and storage account
 
 ```sh
-git clone https://github.com/patnaikshekhar/keda-storage-queue-sample
-cd keda-storage-queue-sample
+git clone https://github.com/patnaikshekhar/KEDA-Azure-Storage-Queues-Node
+cd KEDA-Azure-Storage-Queues-Node
 
 RESOURCE_GROUP=KedaSamples
 LOCATION=eastus
@@ -50,18 +55,18 @@ kubectl create secret generic keda-storage-queue-sample \
   --from-literal=STORAGE_ACCOUNT_CONN_STRING=$CONNECTION_STRING
 ```
 
-We shall now create the queue and deploy the kubernetes objects
+We shall now create the queue and deploy the kubernetes objects. We'll be creating a Deployment and a ScaledObject. The deployment is for a simple node js app which deueues a message from a storage queue and then writes it to standard out. The scaled object is a CRD used by KEDA to determine which deployment to scale and using which metrics. In this case we're looking at the queue length as the metric.
 
 ```sh
-# Deploy the kubernetes objects
-kubectl apply -f manifests/
-
 # Create the queue
 QUEUE_NAME=keda-test
 
 az storage queue create \
   --name $QUEUE_NAME \
   --account-name $STORAGE_ACCOUNT_NAME
+
+# Deploy the kubernetes objects
+kubectl apply -f manifests/
 ```
 
 We can now open a terminal window to start monitoring the pods. You should see no pods started at this point.
@@ -82,4 +87,4 @@ az storage message put \
 done
 ```
 
-You should now see pods automatically spinning up.
+You should now see pods automatically spinning up to process the message. Once all the messages have been processed you would be able to see the pods getting terminated.
