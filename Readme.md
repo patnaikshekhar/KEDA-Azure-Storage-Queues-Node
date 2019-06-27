@@ -78,7 +78,7 @@ kubectl get pods -n keda-storage-queue-sample -w
 Now that the queue is created we're ready to test by placing messages into the queue. Run the following commands to place 20 messages into the queue
 
 ```sh
-for x in {1..10}
+for x in {1..20}
 do
 az storage message put \
   --content="Test Message ${x}" \
